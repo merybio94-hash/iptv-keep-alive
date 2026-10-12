@@ -1,5 +1,8 @@
 import time
 import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 url = "http://up.smf24.cx:8088/hr.php"
 
@@ -9,25 +12,25 @@ params = {
 
 headers = {
     'Host': "up.smf24.cx:8088",
-    'User-Agent': "66482B2359531",
+    'User-Agent': "84388B2359531",
     'Connection': "Keep-Alive"
 }
 
-print("جاري بدء التكرار كل ثانيتين... اضغط Ctrl+C للإيقاف.")
+print("[*] تم بدء تشغيل نظام الإنعاش الذكي مع حماية ضد انقطاع الاتصال...")
 
-counter = 0
-
-try:
-    while True:
-        counter += 1
-        try:
-            response = requests.get(url, params=params, headers=headers, timeout=5)
-            print(f"[{counter}] حالة الطلب: {response.status_code} - الرد: {response.text[:100]}")
-        except requests.exceptions.RequestException as e:
-            print(f"[{counter}] حدث خطأ في الاتصال: {e}")
+while True:
+    try:
+        # رفع مهلة الانتظار إلى 15 ثانية لمنع أخطاء التايم أوت
+        response = requests.get(url, params=params, headers=headers, verify=False, timeout=15)
         
-        # الانتظار لمدة ثانيتين قبل الطلب التالي
-        time.sleep(2)
-
-except KeyboardInterrupt:
-    print("\nتم إيقاف البرنامج بواسطة المستخدم.")
+        print(f"[+] تم التنشيط بنجاح - الحالة: {response.status_code}")
+        
+    except requests.exceptions.Timeout:
+        print("[-] تنبيه: انتهت مهلة الاتصال بالسيرفر، سيتم إعادة المحاولة في الجولة القادمة...")
+    except requests.exceptions.ConnectionError:
+        print("[-] تنبيه: خطأ في الاتصال بالشبكة أو أن السيرفر مغلق مؤقتاً...")
+    except Exception as e:
+        print(f"[-] حدث خطأ غير متوقع: {e}")
+        
+    # زيادة الفاصل الزمني إلى 120 ثانية (دقيقتين) لتخفيف الضغط على السيرفر وتجنب الحظر
+    time.sleep(120)
