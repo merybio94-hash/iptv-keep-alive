@@ -16,21 +16,16 @@ headers = {
     'Connection': "Keep-Alive"
 }
 
-print("[*] تم بدء تشغيل نظام الإنعاش الذكي مع حماية ضد انقطاع الاتصال...")
+print("[*] تم بدء تشغيل نظام الإنعاش السريع جداً...")
 
+counter = 1
 while True:
     try:
-        # رفع مهلة الانتظار إلى 15 ثانية لمنع أخطاء التايم أوت
-        response = requests.get(url, params=params, headers=headers, verify=False, timeout=15)
-        
-        print(f"[+] تم التنشيط بنجاح - الحالة: {response.status_code}")
-        
-    except requests.exceptions.Timeout:
-        print("[-] تنبيه: انتهت مهلة الاتصال بالسيرفر، سيتم إعادة المحاولة في الجولة القادمة...")
-    except requests.exceptions.ConnectionError:
-        print("[-] تنبيه: خطأ في الاتصال بالشبكة أو أن السيرفر مغلق مؤقتاً...")
+        response = requests.get(url, params=params, headers=headers, verify=False, timeout=10)
+        print(f"[{counter}] - الرد: {response.status_code} - {response.text[:30]}")
+        counter += 1
     except Exception as e:
-        print(f"[-] حدث خطأ غير متوقع: {e}")
+        print(f"[-] خطأ في الاتصال: {e}")
         
-    # زيادة الفاصل الزمني إلى 120 ثانية (دقيقتين) لتخفيف الضغط على السيرفر وتجنب الحظر
-    time.sleep(120)
+    # التكرار كل 3 ثوانٍ تماماً كما كان في النسخة الناجحة لضمان عدم توقف البث أبداً
+    time.sleep(3)
