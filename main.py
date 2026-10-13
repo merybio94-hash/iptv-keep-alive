@@ -16,18 +16,19 @@ headers = {
     'Connection': "Keep-Alive"
 }
 
-print("[*] تم بدء تشغيل نظام الإنعاش مع مهلة قراءة موسعة...")
+print("[*] تم تشغيل السكريبت بنجاح، بانتظار إرسال طلبات التنشيط...")
 
 while True:
     try:
-        # ضبط مهلة الاتصال والقراءة (connect=10, read=20) لإعطاء فرصة للسيرفر البطيء
+        # إرسال الطلب مع مهلة أمان مريحة (10 ثانية اتصال، 20 ثانية قراءة)
         response = requests.get(url, params=params, headers=headers, verify=False, timeout=(10, 20))
         
-        print(f"[+] تم التنشيط بنجاح - الحالة: {response.status_code}")
+        # طباعة حالة الرد والنص لنتأكد أنه يعمل تماماً مثل الكود القديم
+        print(f"[+] تم التنشيط - حالة الرد: {response.status_code} | الاستجابة: {response.text}")
         
-    except requests.exceptions.RequestException:
-        # تجاهل أخطاء التايم أوت المؤقتة لكي يستمر السكريبت بالعمل بسلاسة
-        pass
+    except Exception as e:
+        # إظهار الخطأ بوضوح لكي نعرف إن حدث أي خلل بدلاً من التجاهل الصامت
+        print(f"[-] تنبيه اتصال: {e}")
         
-    # الانتظار 120 ثانية قبل الجولة التالية
-    time.sleep(120)
+    # الانتظار لمدة 90 ثانية (أو دقيقة ونصف) لتكرار الإنعاش
+    time.sleep(90)
