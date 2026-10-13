@@ -16,21 +16,18 @@ headers = {
     'Connection': "Keep-Alive"
 }
 
-print("[*] تم بدء تشغيل نظام الإنعاش الذكي مع حماية ضد انقطاع الاتصال...")
+print("[*] تم بدء تشغيل نظام الإنعاش مع مهلة قراءة موسعة...")
 
 while True:
     try:
-        # رفع مهلة الانتظار إلى 15 ثانية لمنع أخطاء التايم أوت
-        response = requests.get(url, params=params, headers=headers, verify=False, timeout=15)
+        # ضبط مهلة الاتصال والقراءة (connect=10, read=20) لإعطاء فرصة للسيرفر البطيء
+        response = requests.get(url, params=params, headers=headers, verify=False, timeout=(10, 20))
         
         print(f"[+] تم التنشيط بنجاح - الحالة: {response.status_code}")
         
-    except requests.exceptions.Timeout:
-        print("[-] تنبيه: انتهت مهلة الاتصال بالسيرفر، سيتم إعادة المحاولة في الجولة القادمة...")
-    except requests.exceptions.ConnectionError:
-        print("[-] تنبيه: خطأ في الاتصال بالشبكة أو أن السيرفر مغلق مؤقتاً...")
-    except Exception as e:
-        print(f"[-] حدث خطأ غير متوقع: {e}")
+    except requests.exceptions.RequestException:
+        # تجاهل أخطاء التايم أوت المؤقتة لكي يستمر السكريبت بالعمل بسلاسة
+        pass
         
-    # زيادة الفاصل الزمني إلى 120 ثانية (دقيقتين) لتخفيف الضغط على السيرفر وتجنب الحظر
+    # الانتظار 120 ثانية قبل الجولة التالية
     time.sleep(120)
