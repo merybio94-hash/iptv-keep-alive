@@ -1,8 +1,5 @@
 import time
 import requests
-import urllib3
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 url = "http://up.smf24.cx:8088/hr.php"
 
@@ -12,20 +9,25 @@ params = {
 
 headers = {
     'Host': "up.smf24.cx:8088",
-    'User-Agent': "84388B2359531",
+    'User-Agent': "66482B2359531",
     'Connection': "Keep-Alive"
 }
 
-print("[*] تم بدء تشغيل نظام الإنعاش السريع جداً...")
+print("جاري بدء التكرار كل ثانيتين... اضغط Ctrl+C للإيقاف.")
 
-counter = 1
-while True:
-    try:
-        response = requests.get(url, params=params, headers=headers, verify=False, timeout=10)
-        print(f"[{counter}] - الرد: {response.status_code} - {response.text[:30]}")
+counter = 0
+
+try:
+    while True:
         counter += 1
-    except Exception as e:
-        print(f"[-] خطأ في الاتصال: {e}")
+        try:
+            response = requests.get(url, params=params, headers=headers, timeout=5)
+            print(f"[{counter}] حالة الطلب: {response.status_code} - الرد: {response.text[:100]}")
+        except requests.exceptions.RequestException as e:
+            print(f"[{counter}] حدث خطأ في الاتصال: {e}")
         
-    # التكرار كل 3 ثوانٍ تماماً كما كان في النسخة الناجحة لضمان عدم توقف البث أبداً
-    time.sleep(3)
+        # الانتظار لمدة ثانيتين قبل الطلب التالي
+        time.sleep(2)
+
+except KeyboardInterrupt:
+    print("\nتم إيقاف البرنامج بواسطة المستخدم.")
